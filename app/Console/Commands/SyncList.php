@@ -43,7 +43,7 @@ class SyncList extends Command
 
         $completed_emails = [];
         $wcbs = resolve('App\Services\WCBSApi');
-        $url = 'https://3sys.isdedu.de/WCBSAPI.ODataApi/CurrentPupil?$select=PupilPerson&$expand=PupilPerson($select=Relationships;$expand=Relationships($select=FromPupilPersonID,ToContactPersonID,RelationshipTypeTo,Rank;$expand=ToContactPerson($select=Title,FirstNames,Surname;$expand=EmailAddresses($select=EmailAddress))))&$filter=AcademicYearCode+eq+'.$year;
+        $url = 'https://3sys.isdedu.de/WCBSAPI.ODataApi/CurrentPupil?$select=PupilPerson&$expand=PupilPerson($select=Relationships;$expand=Relationships($select=FromPupilPersonID,ToContactPersonID,RelationshipTypeTo,Rank;$expand=ToContactPerson($select=Title,FirstNames,Surname;$expand=EmailAddresses($select=EmailAddress))))&$filter=AcademicYearCode+eq+'.$year.' and InUse eq true';
         $result = $wcbs->request($url); // Fetch the data from 3Sys through the API
         $this->info('Syncing List');
         foreach ($result->value as $value) {
