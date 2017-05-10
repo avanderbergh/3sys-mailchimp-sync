@@ -26,7 +26,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')
         //          ->hourly();
-        $schedule->command('list:sync 058a057a3b 2016')->daily();
+        $schedule->command('list:sync 058a057a3b 2016')->everyMinute();
     }
 
     /**
