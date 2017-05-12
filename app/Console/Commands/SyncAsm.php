@@ -85,7 +85,7 @@ class SyncAsm extends Command
             }
         }
 
-        $url = 'https://3sys.isdedu.de/WCBSAPI.ODataApi/Staff?$select=ID,Code,SectionCode,SectionID,StaffPerson&$expand=StaffPerson($select=Surname,PreferredName,EmailAddresses;$expand=EmailAddresses($select=EmailAddress;$filter=EmailAddressTypeDescription+eq+\'Internal+Staff+email\'))&$filter=InUse+eq+true+and+SchoolCode+eq+\'IS\'+and+CategoryCode+eq+\'TEA001\'';
+        $url = 'https://3sys.isdedu.de/WCBSAPI.ODataApi/Staff?$select=ID,Code,SectionCode,SectionID,StaffPerson&$expand=StaffPerson($select=Surname,PreferredName,EmailAddresses;$expand=EmailAddresses($select=EmailAddress;$filter=EmailAddressTypeDescription+eq+\'Internal+Staff+email\'))&$filter=InUse+eq+true+and+SchoolCode+eq+\'IS\'+and+CategoryCode+eq+\'TEA001\'+and+SectionCode+ne+null';
         $result = $wcbs->request($url);     // Fetch the data from 3Sys through the API
         $staff_csv_result = "person_id,person_number,first_name,middle_name,last_name,email_address,sis_username,location_id\r\n";
         foreach($result->value as $staff) {
