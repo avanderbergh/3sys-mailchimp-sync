@@ -99,7 +99,7 @@ class SyncAsm extends Command
         Storage::put('asm/csv/courses.csv', $courses_csv_content);
         Storage::put('asm/csv/classes.csv', $classes_csv_content);
         Storage::put('asm/csv/students.csv', $student_csv_result);
-        Storage::put('asm/csv/roster.csv', $roster_csv_result);
+        Storage::put('asm/csv/rosters.csv', $roster_csv_result);
         Storage::put('asm/csv/staff.csv', $staff_csv_result);
 
         $this->info('Done!');
