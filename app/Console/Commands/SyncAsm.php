@@ -40,7 +40,7 @@ class SyncAsm extends Command
     {
         $year = $this->argument('year');    // the academic year
         $wcbs = resolve('App\Services\WCBSApi');
-        $url = 'https://3sys.isdedu.de/WCBSAPI.ODataApi/Subject?$select=ID,Code,Description,SubjectSets&$expand=SubjectSets($select=ID,Code,SectionCode,SectionID,SectionID,SectionID,Description,Tutor;$expand=Tutor($select=TutorID,TutorCode);$filter=AcademicYearCode+eq+'.$year.'+and+SchoolCode+eq+\'IS\')&$filter=InUse+eq+true+and+SchoolCode+eq+\'IS\'';
+        $url = 'https://3sys.isdedu.de/WCBSAPI.ODataApi/Subject?$select=ID,Code,Description,SubjectSets&$expand=SubjectSets($select=ID,Code,SectionCode,SectionID,Description,Tutor;$expand=Tutor($select=TutorID,TutorCode);$filter=AcademicYearCode+eq+'.$year.'+and+SchoolCode+eq+\'IS\'+and+SectionID+ne+null)&$filter=InUse+eq+true+and+SchoolCode+eq+\'IS\'';
         $result = $wcbs->request($url);     // Fetch the data from 3Sys through the API
         $courses_csv_content = "course_id,course_number,course_name,location_id\r\n";
         $classes_csv_content = "class_id,class_number,course_id,instructor_id,instructor_id_2,instructor_id_3,location_id\r\n";
