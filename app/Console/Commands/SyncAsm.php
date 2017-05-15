@@ -38,6 +38,8 @@ class SyncAsm extends Command
      */
     public function handle()
     {
+        $exclude_subject_sets = [1928206877, 1928206879];
+
         $year = $this->argument('year');    // the academic year
         $wcbs = resolve('App\Services\WCBSApi');
         $url = 'https://3sys.isdedu.de/WCBSAPI.ODataApi/Subject?$select=ID,Code,Description,SubjectSets&$expand=SubjectSets($select=ID,Code,SectionCode,SectionID,Description,Tutor;$expand=Tutor($select=TutorID,TutorCode);$filter=AcademicYearCode+eq+'.$year.'+and+SchoolCode+eq+\'IS\'+and+SectionID+ne+null)&$filter=InUse+eq+true+and+SchoolCode+eq+\'IS\'';
@@ -52,17 +54,19 @@ class SyncAsm extends Command
                                         $subject->Description.','.
                                         $subject->SubjectSets[0]->SectionID."\r\n";
                 foreach($subject->SubjectSets as $subject_set) {
-                    $classes_csv_content .= $subject_set->ID.','.
-                                            $subject_set->Code.','.
-                                            $subject->ID.',';
-                    for($i = 0; $i <= 2; $i++){
-                        if (count($subject_set->Tutor) > $i) {
-                            $classes_csv_content .= $subject_set->Tutor[$i]->TutorID.',';
-                        } else {
-                            $classes_csv_content .= ',';
+                    if (!in_array($subject_set->ID, $exclude_subject_sets)) {
+                        $classes_csv_content .= $subject_set->ID.','.
+                                                $subject_set->Code.','.
+                                                $subject->ID.',';
+                        for($i = 0; $i <= 2; $i++){
+                            if (count($subject_set->Tutor) > $i) {
+                                $classes_csv_content .= $subject_set->Tutor[$i]->TutorID.',';
+                            } else {
+                                $classes_csv_content .= ',';
+                            }
                         }
+                        $classes_csv_content .= $subject_set->SectionID."\r\n";
                     }
-                    $classes_csv_content .= $subject_set->SectionID."\r\n";
                 }
             }
         }
@@ -79,9 +83,11 @@ class SyncAsm extends Command
                                     $student->PupilPerson->EmailAddresses[0]->EmailAddress.',,,'.
                                     $student->Form->SectionID."\r\n";
             foreach($student->SubjectSets as $roster) {
-                $roster_csv_result .=   $roster->ID.','.
-                                        $roster->SubjectSetID.','.
-                                        $student->ID."\r\n";
+                if (!in_array($roster->SubjectSetID,$exclude_subject_sets)){
+                    $roster_csv_result .=   $roster->ID.','.
+                                            $roster->SubjectSetID.','.
+                                            $student->ID."\r\n";
+                }
             }
         }
 
