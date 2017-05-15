@@ -38,7 +38,7 @@ class SyncAsm extends Command
      */
     public function handle()
     {
-        $exclude_subject_sets = [1928206877, 1928206879];
+        $exclude_subject_sets = ['1928206877', '1928206879'];
 
         $year = $this->argument('year');    // the academic year
         $wcbs = resolve('App\Services\WCBSApi');
