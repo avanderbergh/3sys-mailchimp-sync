@@ -40,7 +40,7 @@ class SyncList extends Command
     {
         $listID = $this->argument('listID'); // the list ID of the list in MailChimp
         $year = $this->argument('year');    // the academic year
-
+        dd([$listID, $year]);
         $completed_emails = [];
         $wcbs = resolve('App\Services\WCBSApi');
         $url = 'https://3sys.isdedu.de/WCBSAPI.ODataApi/CurrentPupil?$select=PupilPerson&$expand=PupilPerson($select=Relationships;$expand=Relationships($select=FromPupilPersonID,ToContactPersonID,RelationshipTypeTo,Rank;$expand=ToContactPerson($select=Title,FirstNames,Surname;$expand=EmailAddresses($select=EmailAddress,EmailAddressTypeDescription))))&$filter=AcademicYearCode+eq+'.$year.'+and+InUse+eq+true';
