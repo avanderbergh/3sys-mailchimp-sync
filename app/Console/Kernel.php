@@ -15,6 +15,9 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         Commands\SyncList::class,
         Commands\SyncAsm::class,
+        Commands\TestWonde::class,
+        Commands\TestWcbsApi2::class,
+        Commands\SyncSchoologyCourses::class,
     ];
 
     /**

@@ -168,6 +168,8 @@ return [
          */
         Laravel\Tinker\TinkerServiceProvider::class,
         Mailchimp\MailchimpServiceProvider::class,
+        Avanderbergh\Schoology\Saml2ServiceProvider::class,
+        Avanderbergh\Schoology\SchoologyServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -227,6 +229,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'MC' => Mailchimp\MailchimpFacade::class,
+        'Schoology' => Avanderbergh\Schoology\Facades\Schoology::class,
 
     ],
 
