@@ -121,7 +121,7 @@ class SyncAsm extends Command
 
         $connection = \ssh2_connect('upload.appleschoolcontent.com', 22);
         \ssh2_auth_password($connection, env('ASM_USER'), env('ASM_PASSWORD'));
-        $copy = \ssh2_scp_send($connection, storage_path('app/asm/asm.zip'), '/dropbox/asm.zip', 0644);
+        $copy = \ssh2_scp_send($connection, storage_path('app/asm/asm.zip'), 'dropbox/asm.zip', 0644);
         dd($copy);
         /*
 
