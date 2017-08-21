@@ -2,8 +2,10 @@
 
 namespace App\Console\Commands;
 
+use Chumper\Zipper\Zipper;
 use Illuminate\Console\Command;
 use Storage;
+use ZanySoft\Zip\Zip;
 
 class SyncAsm extends Command
 {
@@ -38,7 +40,7 @@ class SyncAsm extends Command
      */
     public function handle()
     {
-        $exclude_subject_sets = ['1928206877', '1928206878', '1928206879', '1928207281', '1931718732', '1928207026', '1936469362'];
+        $exclude_subject_sets = ['1942521949', '1942521800', '1942521591', '1942521883', '1942521626', '1942521388', '1942521625'];
 
         $year = $this->argument('year');    // the academic year
         $wcbs = resolve('App\Services\WCBSApi');
@@ -75,19 +77,23 @@ class SyncAsm extends Command
         $student_csv_result = "person_id,person_number,first_name,middle_name,last_name,grade_level,email_address,sis_username,password_policy,location_id\r\n";
         $roster_csv_result = "roster_id,class_id,student_id\r\n";
         foreach($result->value as $student) {
-            $student_csv_result .=  $student->ID.','.
-                                    sprintf("%d",$student->Code).','.
-                                    $student->PupilPerson->PreferredName.',,'.
-                                    $student->PupilPerson->Surname.','.
-                                    $student->Form->FormYearCode.','.
-                                    $student->PupilPerson->EmailAddresses[0]->EmailAddress.',,,'.
-                                    $student->Form->SectionID."\r\n";
-            foreach($student->SubjectSets as $roster) {
-                if (!in_array($roster->SubjectSetID,$exclude_subject_sets)){
-                    $roster_csv_result .=   $roster->ID.','.
-                                            $roster->SubjectSetID.','.
-                                            $student->ID."\r\n";
+            if (!empty($student->PupilPerson->EmailAddresses)){
+                $student_csv_result .=  $student->ID.','.
+                    sprintf("%d",$student->Code).','.
+                    $student->PupilPerson->PreferredName.',,'.
+                    $student->PupilPerson->Surname.','.
+                    $student->Form->FormYearCode.','.
+                    $student->PupilPerson->EmailAddresses[0]->EmailAddress.',,,'.
+                    $student->Form->SectionID."\r\n";
+                foreach($student->SubjectSets as $roster) {
+                    if (!in_array($roster->SubjectSetID,$exclude_subject_sets)){
+                        $roster_csv_result .=   $roster->ID.','.
+                            $roster->SubjectSetID.','.
+                            $student->ID."\r\n";
+                    }
                 }
+            } else {
+                $this->error('No email Address for ' . $student->PupilPerson->PreferredName . ' '. $student->PupilPerson->Surname);
             }
         }
 
@@ -102,12 +108,46 @@ class SyncAsm extends Command
                                     $staff->StaffPerson->EmailAddresses[0]->EmailAddress.',,'.
                                     $staff->SectionID."\r\n";
         }
+
+        $zipper = new Zipper;
+        $zipper->make(storage_path('app/asm/asm.zip'))
+            ->addString('courses.csv', $courses_csv_content)
+            ->addString('classes.csv', $classes_csv_content)
+            ->addString('students.csv', $student_csv_result)
+            ->addString('rosters.csv', $roster_csv_result)
+            ->addString('staff.csv', $staff_csv_result)
+            ->close();
+
+
+        $connection = \ssh2_connect('upload.appleschoolcontent.com', 22);
+        \ssh2_auth_password($connection, env('ASM_USER'), env('ASM_PASSWORD'));
+        $copy = \ssh2_scp_send($connection, storage_path('app/asm/asm.zip'), '/dropbox/asm.zip', 0644);
+        dd($copy);
+        /*
+
         Storage::put('asm/csv/courses.csv', $courses_csv_content);
         Storage::put('asm/csv/classes.csv', $classes_csv_content);
         Storage::put('asm/csv/students.csv', $student_csv_result);
         Storage::put('asm/csv/rosters.csv', $roster_csv_result);
         Storage::put('asm/csv/staff.csv', $staff_csv_result);
 
+        $zip = new \ZipArchive();
+        if($zip->open(storage_path('app/asm/asm.zip'),\ZIPARCHIVE::CREATE) !== true) {
+            return false;
+        };
+        $zip->addFromString('courses.csv', $courses_csv_content);
+        $zip->addFromString('classes.csv', $classes_csv_content);
+        $zip->addFromString('students.csv', $student_csv_result);
+        $zip->addFromString('rosters.csv', $roster_csv_result);
+        $zip->addFromString('staff.csv', $staff_csv_result);
+        $zip->close();
+
+        /*
+        $zip = Zip::create(storage_path('app/asm/asm.zip'));
+        $zip->add(storage_path('app/asm/csv', true));
+        $zip->close();
+        dd($zip);
+        */
         $this->info('Done!');
     }
 }

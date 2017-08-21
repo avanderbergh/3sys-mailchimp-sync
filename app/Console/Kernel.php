@@ -18,6 +18,7 @@ class Kernel extends ConsoleKernel
         Commands\TestWonde::class,
         Commands\TestWcbsApi2::class,
         Commands\SyncSchoologyCourses::class,
+        Commands\SyncManageBac::class,
     ];
 
     /**

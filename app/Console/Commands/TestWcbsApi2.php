@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Avanderbergh\Schoology\SchoologyApi;
+use Illuminate\Support\Facades\Storage;
 
 class TestWcbsApi2 extends Command
 {
@@ -44,11 +45,25 @@ class TestWcbsApi2 extends Command
         $response = $wcbs->getRequest('schools(1)/Pupils?$expand=Name,Form($expand=FormYear)&$filter=SubSchool eq \'SRS\' and AcademicYear eq 2017 and RecordType eq \'Current\'');
         $result = json_decode($response->getBody()->getContents());
         $students = array_merge($result->value, $students);
-        while (property_exists($result, '@odata.nextLink')){
+        $bar = $this->output->createProgressBar();
+        while (property_exists($result, '@odata.nextLink')) {
             $response = $wcbs->getUrl($result->{'@odata.nextLink'});
             $result = json_decode($response->getBody()->getContents());
             $students = array_merge($result->value, $students);
+            $bar->advance();
         }
+        $bar->finish();
+        echo PHP_EOL;
+        $this->info('Creating CSV');
+        //$bar = $this->output->createProgressBar(sizeof($students));
+        $student_csv = 'Code,Name,Surname' . PHP_EOL;
+        foreach ($students as $k => $student) {
+            $student_csv .= $student->Code . ',' . $student->Name->PreferredName . ',' . $student->Name->Surname . PHP_EOL;
+            echo $k . PHP_EOL;
+            //$bar->advance();
+        }
+        //$bar->finish();
+        Storage::put('api-students.csv', $student_csv);
         $schoology_key = env('CONSUMER_KEY');
         $schoology_secret = env('CONSUMER_SECRET');
         $schoology = new SchoologyApi($schoology_key,$schoology_secret,null,null,null, true);

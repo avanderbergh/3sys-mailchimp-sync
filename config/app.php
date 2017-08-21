@@ -170,6 +170,9 @@ return [
         Mailchimp\MailchimpServiceProvider::class,
         Avanderbergh\Schoology\Saml2ServiceProvider::class,
         Avanderbergh\Schoology\SchoologyServiceProvider::class,
+        Chumper\Zipper\ZipperServiceProvider::class,
+        ZanySoft\Zip\ZipServiceProvider::class,
+
 
         /*
          * Application Service Providers...
@@ -230,7 +233,8 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'MC' => Mailchimp\MailchimpFacade::class,
         'Schoology' => Avanderbergh\Schoology\Facades\Schoology::class,
-
+        'Zipper' => Chumper\Zipper\Zipper::class,
+        'Zip' => ZanySoft\Zip\ZipFacade::class,
     ],
 
 ];

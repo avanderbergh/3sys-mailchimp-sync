@@ -7,11 +7,14 @@
     "require": {
         "php": ">=5.6.4",
         "avanderbergh/laravel-schoology": "^0.2.7",
+        "chumper/zipper": "^1.0",
+        "eduvo/php-api-library": "^1.0",
         "laravel/framework": "5.4.*",
         "laravel/tinker": "~1.0",
         "league/oauth2-client": "^2.2",
         "pacely/mailchimp-apiv3": "^1.0",
-        "wondeltd/php-client": "^1.4"
+        "wondeltd/php-client": "^1.4",
+        "zanysoft/laravel-zip": "^1.0"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
