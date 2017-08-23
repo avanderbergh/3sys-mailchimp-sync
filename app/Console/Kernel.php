@@ -17,7 +17,7 @@ class Kernel extends ConsoleKernel
         Commands\SyncAsm::class,
         Commands\TestWonde::class,
         Commands\TestWcbsApi2::class,
-        Commands\SyncSchoologyCourses::class,
+        Commands\SyncSchoology::class,
         Commands\SyncManageBac::class,
     ];
 

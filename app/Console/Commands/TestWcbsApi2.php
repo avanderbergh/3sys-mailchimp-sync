@@ -55,15 +55,15 @@ class TestWcbsApi2 extends Command
         $bar->finish();
         echo PHP_EOL;
         $this->info('Creating CSV');
-        //$bar = $this->output->createProgressBar(sizeof($students));
+        $bar = $this->output->createProgressBar(sizeof($students));
         $student_csv = 'Code,Name,Surname' . PHP_EOL;
         foreach ($students as $k => $student) {
             $student_csv .= $student->Code . ',' . $student->Name->PreferredName . ',' . $student->Name->Surname . PHP_EOL;
-            echo $k . PHP_EOL;
-            //$bar->advance();
+            $bar->advance();
         }
-        //$bar->finish();
+        $bar->finish();
         Storage::put('api-students.csv', $student_csv);
+
         $schoology_key = env('CONSUMER_KEY');
         $schoology_secret = env('CONSUMER_SECRET');
         $schoology = new SchoologyApi($schoology_key,$schoology_secret,null,null,null, true);
