@@ -56,8 +56,8 @@ class SyncDaysSchoology extends Command
         $bar = $this->output->createProgressBar(sizeof($days));
         foreach ($days as $day) {
             $body = [
-                'title' => $day->DayName,
-                'start' => $day->CalendarDate,
+                'title' => $day['DayName'],
+                'start' => $day['CalendarDate'],
                 'all_day' => 1,
                 'comments_enabled' => 0,
             ];
