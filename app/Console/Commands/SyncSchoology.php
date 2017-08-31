@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 use Avanderbergh\Schoology\SchoologyApi;
+use SebastianBergmann\CodeCoverage\Report\PHP;
 
 /**
  * Class SyncSchoologyCourses
@@ -41,6 +42,7 @@ class SyncSchoology extends Command
      */
     public function handle()
     {
+        setlocale(LC_ALL, 'en_US.UTF8');
         $wcbs = resolve('App\Services\WCBSApi2');
         $students = [];
         $this->info('Fetching Students from WCBS');
@@ -77,7 +79,7 @@ class SyncSchoology extends Command
                     'user' => [
                         'school_uid' => $student->Code,
                         'name_first' => $student->Name->PreferredName,
-                        'name_last' => $student->Name->Surname[0] . ' ' . $student->Form->Description,
+                        'name_last' => utf8_encode($student->Name->Surname[0]) . ' ' . $student->Form->Description,
                         'primary_email' => $student->Name->EmailAddress,
                         'role_id' => 266721
                     ]
@@ -86,7 +88,7 @@ class SyncSchoology extends Command
             try {
                 $result = $schoology->apiResult('users?update_existing=1', 'POST', $body);
             } catch (\Exception $e) {
-                $this->error($e->getMessage());
+                $this->error('Can\'t create student: ' . $student->Code . PHP_EOL);
             }
             $bar->advance();
         }
@@ -155,7 +157,7 @@ class SyncSchoology extends Command
                         if ($has_tutor) {
                             $active_sets++;
                             $body['courses']['course']['sections']['section'][] = [
-                                'title' => $subject_set->Code,
+                                'title' => $subject_set->Description,
                                 'section_code' => $subject_set->SetCode,
                                 'grading_periods' => [
                                     407562

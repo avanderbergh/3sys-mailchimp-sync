@@ -19,6 +19,7 @@ class Kernel extends ConsoleKernel
         Commands\TestWcbsApi2::class,
         Commands\SyncSchoology::class,
         Commands\SyncManageBac::class,
+        Commands\SyncDaysSchoology::class,
     ];
 
     /**

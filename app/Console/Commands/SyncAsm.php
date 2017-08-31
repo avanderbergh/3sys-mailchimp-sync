@@ -40,11 +40,16 @@ class SyncAsm extends Command
      */
     public function handle()
     {
-        $exclude_subject_sets = ['1942521949', '1942521800', '1942521591', '1942521883', '1942521626', '1942521388', '1942521625'];
+        $exclude_subject_sets = [
+            '1942521949', '1942521800', '1942521591',
+            '1942521883', '1942521626', '1942521388',
+            '1942521625', '1945856750', '1942521549',
+            '1945924781', '1945924830', '1945924936',
+            '1946145782', '1945924870'];
 
         $year = $this->argument('year');    // the academic year
         $wcbs = resolve('App\Services\WCBSApi');
-        $url = 'https://3sys.isdedu.de/WCBSAPI.ODataApi/Subject?$select=ID,Code,Description,SubjectSets&$expand=SubjectSets($select=ID,Code,SectionCode,SectionID,Description,Tutor;$expand=Tutor($select=TutorID,TutorCode);$filter=AcademicYearCode+eq+'.$year.'+and+SchoolCode+eq+\'IS\'+and+SectionID+ne+null)&$filter=InUse+eq+true+and+SchoolCode+eq+\'IS\'';
+        $url = 'https://3sys.isdedu.de/WCBSAPI.ODataApi/Subject?$select=ID,Code,Description,SubjectSets&$expand=SubjectSets($select=ID,Code,SectionCode,SectionID,Description,Tutor;$expand=Tutor($select=TutorID,TutorCode),Pupils;$filter=AcademicYearCode+eq+'.$year.'+and+SchoolCode+eq+\'IS\'+and+SectionID+ne+null)&$filter=InUse+eq+true+and+SchoolCode+eq+\'IS\'';
         $result = $wcbs->request($url);     // Fetch the data from 3Sys through the API
         $courses_csv_content = "course_id,course_number,course_name,location_id\r\n";
         $classes_csv_content = "class_id,class_number,course_id,instructor_id,instructor_id_2,instructor_id_3,location_id\r\n";
@@ -56,7 +61,7 @@ class SyncAsm extends Command
                                         $subject->Description.','.
                                         $subject->SubjectSets[0]->SectionID."\r\n";
                 foreach($subject->SubjectSets as $subject_set) {
-                    if (!in_array($subject_set->ID, $exclude_subject_sets)) {
+                    if (!in_array($subject_set->ID, $exclude_subject_sets ) && sizeof($subject_set->Pupils) > 0) {
                         $classes_csv_content .= $subject_set->ID.','.
                                                 $subject_set->Code.','.
                                                 $subject->ID.',';
@@ -109,6 +114,33 @@ class SyncAsm extends Command
                                     $staff->SectionID."\r\n";
         }
 
+        Storage::put('asm/csv/courses.csv', $courses_csv_content);
+        Storage::put('asm/csv/classes.csv', $classes_csv_content);
+        Storage::put('asm/csv/students.csv', $student_csv_result);
+        Storage::put('asm/csv/rosters.csv', $roster_csv_result);
+        Storage::put('asm/csv/staff.csv', $staff_csv_result);
+
+        $zip = new \ZipArchive();
+        if($zip->open(storage_path('app/asm/asm.zip'),\ZIPARCHIVE::OVERWRITE) !== true) {
+            return false;
+        };
+        $zip->addFromString('courses.csv', $courses_csv_content);
+        $zip->addFromString('classes.csv', $classes_csv_content);
+        $zip->addFromString('students.csv', $student_csv_result);
+        $zip->addFromString('rosters.csv', $roster_csv_result);
+        $zip->addFromString('staff.csv', $staff_csv_result);
+        $zip->addFile(storage_path('app/asm/csv/locations.csv'),'locations.csv');
+        $zip->close();
+        dd("Done");
+
+        $connection = \ssh2_connect('upload.appleschoolcontent.com', 22);
+        \ssh2_auth_password($connection, env('ASM_USER'), env('ASM_PASSWORD'));
+        $copy = \ssh2_scp_send($connection, storage_path('app/asm/asm.zip'), 'asm.zip', 0644);
+        dd($copy);
+        /*
+
+
+
         $zipper = new Zipper;
         $zipper->make(storage_path('app/asm/asm.zip'))
             ->addString('courses.csv', $courses_csv_content)
@@ -117,30 +149,6 @@ class SyncAsm extends Command
             ->addString('rosters.csv', $roster_csv_result)
             ->addString('staff.csv', $staff_csv_result)
             ->close();
-
-
-        $connection = \ssh2_connect('upload.appleschoolcontent.com', 22);
-        \ssh2_auth_password($connection, env('ASM_USER'), env('ASM_PASSWORD'));
-        $copy = \ssh2_scp_send($connection, storage_path('app/asm/asm.zip'), 'asm.zip', 0644);
-        dd($copy);
-        /*
-
-        Storage::put('asm/csv/courses.csv', $courses_csv_content);
-        Storage::put('asm/csv/classes.csv', $classes_csv_content);
-        Storage::put('asm/csv/students.csv', $student_csv_result);
-        Storage::put('asm/csv/rosters.csv', $roster_csv_result);
-        Storage::put('asm/csv/staff.csv', $staff_csv_result);
-
-        $zip = new \ZipArchive();
-        if($zip->open(storage_path('app/asm/asm.zip'),\ZIPARCHIVE::CREATE) !== true) {
-            return false;
-        };
-        $zip->addFromString('courses.csv', $courses_csv_content);
-        $zip->addFromString('classes.csv', $classes_csv_content);
-        $zip->addFromString('students.csv', $student_csv_result);
-        $zip->addFromString('rosters.csv', $roster_csv_result);
-        $zip->addFromString('staff.csv', $staff_csv_result);
-        $zip->close();
 
         /*
         $zip = Zip::create(storage_path('app/asm/asm.zip'));
