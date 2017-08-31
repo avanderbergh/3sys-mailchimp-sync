@@ -58,8 +58,9 @@ class SyncDaysSchoology extends Command
             $body = [
                 'title' => $day['DayName'],
                 'start' => $day['CalendarDate'],
-                'all_day' => 1,
-                'comments_enabled' => 0,
+                'all_day' => '1',
+                'comments_enabled' => '0',
+                'type' => 'event',
             ];
             $this->info('Creating ' . $day['DayName'] . ' on ' . $day['CalendarDate']);
             try {
