@@ -2,8 +2,9 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use PDO;
+use Illuminate\Console\Command;
+use Avanderbergh\Schoology\SchoologyApi;
 
 class SyncDaysSchoology extends Command
 {
@@ -47,6 +48,27 @@ class SyncDaysSchoology extends Command
         $stmt=$db->prepare($sql);
         $stmt->execute();
         $days=$stmt->fetchAll(PDO::FETCH_ASSOC);
-        dd($days);
+
+        $schoology_key = env('CONSUMER_KEY');
+        $schoology_secret = env('CONSUMER_SECRET');
+        $schoology = new SchoologyApi($schoology_key,$schoology_secret,null,null,null, true);
+
+        $bar = $this->output->createProgressBar(sizeof($days));
+        foreach ($days as $day) {
+            $body = [
+                'title' => $day->DayName,
+                'start' => $day->CalendarDate,
+                'all_day' => 1,
+                'comments_enabled' => 0,
+            ];
+            try {
+                $schoology->apiResult('schools/12130161/event', 'POST', $body);
+            } catch (\Exception $e) {
+                $this->error('Failed to create event');
+            }
+            $bar->advance();
+            dd("Early Exit!");
+        }
+        $bar->finish();
     }
 }
