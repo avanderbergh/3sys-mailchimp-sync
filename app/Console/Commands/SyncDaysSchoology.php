@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use PDO;
 
 class SyncDaysSchoology extends Command
 {
@@ -41,7 +42,7 @@ class SyncDaysSchoology extends Command
         $dbname = 'PassMain';
         $usr = env('WCBS_API_LOGIN');
         $psw = env('WCBS_API_PASSWORD');
-        $db = new \PDO("dblib:host=$hostdb;dbname=$dbname", $usr, $psw);
+        $db = new PDO("dblib:host=$hostdb;dbname=$dbname", $usr, $psw);
         $sql="SELECT DayName, CalendarDate, TimetableId FROM IS_AC_PROJECTED_TIMETABLE WHERE CalendarDate>='2017-08-01 00:00:00.000' AND TimetableId='1900681585'";
         $stmt=$db->prepare($sql);
         $stmt->execute();
