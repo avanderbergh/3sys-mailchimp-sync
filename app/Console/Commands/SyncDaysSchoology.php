@@ -61,6 +61,7 @@ class SyncDaysSchoology extends Command
                 'all_day' => 1,
                 'comments_enabled' => 0,
             ];
+            $this->info('Creating ' . $day['DayName'] . ' on ' . $day['CalendarDate']);
             try {
                 $schoology->apiResult('schools/12130161/event', 'POST', $body);
             } catch (\Exception $e) {
