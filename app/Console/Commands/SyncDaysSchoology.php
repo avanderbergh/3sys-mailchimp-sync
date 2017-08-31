@@ -64,7 +64,7 @@ class SyncDaysSchoology extends Command
             ];
             $this->info('Creating ' . $day['DayName'] . ' on ' . $day['CalendarDate']);
             try {
-                $schoology->apiResult('schools/12130161/event', 'POST', $body);
+                $schoology->apiResult('schools/12130161/events', 'POST', $body);
             } catch (\Exception $e) {
                 $this->error('Failed to create event');
             }
