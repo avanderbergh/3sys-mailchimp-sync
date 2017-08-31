@@ -69,7 +69,6 @@ class SyncDaysSchoology extends Command
                 $this->error('Failed to create event');
             }
             $bar->advance();
-            dd("Early Exit!");
         }
         $bar->finish();
     }
