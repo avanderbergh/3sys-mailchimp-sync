@@ -67,7 +67,7 @@ class SyncAsm extends Command
                                                 $subject->ID.',';
                         for($i = 0; $i <= 2; $i++){
                             if (count($subject_set->Tutor) > $i) {
-                                $classes_csv_content .= $subject_set->Tutor[$i]->TutorID.',';
+                                $classes_csv_content .= $subject_set->Tutor[$i]->TutorCode.',';
                             } else {
                                 $classes_csv_content .= ',';
                             }
@@ -83,18 +83,17 @@ class SyncAsm extends Command
         $roster_csv_result = "roster_id,class_id,student_id\r\n";
         foreach($result->value as $student) {
             if (!empty($student->PupilPerson->EmailAddresses)){
-                $student_csv_result .=  $student->ID.','.
-                    sprintf("%d",$student->Code).','.
+                $student_csv_result .=  sprintf("%d",$student->Code) .',,'.
                     $student->PupilPerson->PreferredName.',,'.
                     $student->PupilPerson->Surname.','.
                     $student->Form->FormYearCode.','.
                     $student->PupilPerson->EmailAddresses[0]->EmailAddress.',,,'.
-                    $student->Form->SectionID."\r\n";
+                    $student->Form->SectionID . "\r\n";
                 foreach($student->SubjectSets as $roster) {
                     if (!in_array($roster->SubjectSetID,$exclude_subject_sets)){
                         $roster_csv_result .=   $roster->ID.','.
                             $roster->SubjectSetID.','.
-                            $student->ID."\r\n";
+                            sprintf("%d",$student->Code) . "\r\n";
                     }
                 }
             } else {
@@ -106,8 +105,7 @@ class SyncAsm extends Command
         $result = $wcbs->request($url);     // Fetch the data from 3Sys through the API
         $staff_csv_result = "person_id,person_number,first_name,middle_name,last_name,email_address,sis_username,location_id\r\n";
         foreach($result->value as $staff) {
-            $staff_csv_result .=    $staff->ID.','.
-                                    $staff->Code.','.
+            $staff_csv_result .=    $staff->Code.',,'.
                                     $staff->StaffPerson->PreferredName.',,'.
                                     $staff->StaffPerson->Surname.','.
                                     $staff->StaffPerson->EmailAddresses[0]->EmailAddress.',,'.
