@@ -30,8 +30,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('list:sync c927498c0a 2017')
-            ->daily();
+        $schedule->command('list:sync c927498c0a 2017')->daily();
+        $schedule->command('sync:schoology')->twiceDaily();
     }
 
     /**
