@@ -117,7 +117,7 @@ class SyncSchoology extends Command
         $schoology_secret = env('CONSUMER_SECRET');
         $schoology = new SchoologyApi($schoology_key,$schoology_secret,null,null,null, true);
         $bar = $this->output->createProgressBar(sizeof($subjects));
-        $excluded_subjects = ['MYPPP'];
+        $excluded_subjects = ['MYPPP', 'AS', 'MORRIS'];
         foreach ($subjects as $k => $subject) {
             if (!in_array($subject['code'], $excluded_subjects)){
                 $active_sets = 0;
