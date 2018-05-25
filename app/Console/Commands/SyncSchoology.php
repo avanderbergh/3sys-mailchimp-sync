@@ -74,6 +74,31 @@ class SyncSchoology extends Command
         $this->info('Creating/Updating Students in Schoology');
         $bar = $this->output->createProgressBar(count($students));
         foreach ($students as $student) {
+            switch ($student->Form->FormYear->Code) {
+                case 6:
+                    $grad_year = 2024;
+                    break;
+                case 7:
+                    $grad_year = 2023;
+                    break;
+                case 8:
+                    $grad_year = 2022;
+                    break;
+                case 9:
+                    $grad_year = 2021;
+                    break;
+                case 10:
+                    $grad_year = 2020;
+                    break;
+                case 11:
+                    $grad_year = 2019;
+                    break;
+                case 12:
+                    $grad_year = 2018;
+                    break;
+                default:
+                    $grad_year = 0;
+            }
             $body = [
                 'users' => [
                     'user' => [
@@ -81,7 +106,8 @@ class SyncSchoology extends Command
                         'name_first' => $student->Name->PreferredName,
                         'name_last' => utf8_encode($student->Name->Surname[0]) . ' ' . $student->Form->Description,
                         'primary_email' => $student->Name->EmailAddress,
-                        'role_id' => 266721
+                        'role_id' => 266721,
+                        'grad_year' => $grad_year,
                     ]
                 ]
             ];
